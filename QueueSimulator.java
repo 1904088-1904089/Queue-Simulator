@@ -10,44 +10,39 @@ public class QueueSimulator {
 
     private BankQueue bankQueue;
 
+
     public QueueSimulator(int numTellers, int maxBankQueueLength) {
         this.bankQueue = new BankQueue(numTellers, maxBankQueueLength);
     }
 
     public void simulate(int durationMinutes) {
         int currentTime = 0;
-        int endTime = durationMinutes * 60;
+        int endTime = durationMinutes*60 ;
 
         while (currentTime < endTime) {
             int nextArrival = ThreadLocalRandom.current().nextInt(20, 61); // 20 to 60 seconds
-            currentTime += nextArrival;
-
-            Customer customer = new Customer(currentTime);
-            totalCustomersArrived++;
-
-            boolean addedToBankQueue = bankQueue.addCustomer(customer);
-           
-
-            if (!addedToBankQueue ) {
-                totalCustomersLeft++;
-                customer.setWasServed(false);
-            }
-
-            // Serve customers at bank tellers and grocery cashiers
-            for (int i = 0; i < bankQueue.tellers; i++) {
-                Customer servedCustomer = bankQueue.serveCustomer();
-                if (servedCustomer != null) {
-                    totalCustomersServed++;
-                    totalServiceTime += servedCustomer.getServiceTime();
+            //currentTime += nextArrival;
+            if(nextArrival<=endTime-currentTime) {
+                Customer customer = new Customer(currentTime);
+                totalCustomersArrived++;
+                boolean addedToBankQueue = bankQueue.addCustomer(customer);
+                if (!addedToBankQueue ) {
+                    totalCustomersLeft++;
+                    customer.setWasServed(false);
                 }
             }
+
 
            
             currentTime++;
         }
+        bankQueue.stop();
     }
 
+    
     public void printStatistics() {
+        totalCustomersServed=bankQueue.getTotalservedCustomer();
+        totalServiceTime=bankQueue.getTotalServiceTime();
         double averageServiceTime = (double) totalServiceTime / totalCustomersServed;
         System.out.println("Total customers arrived: " + totalCustomersArrived);
         System.out.println("Total customers served: " + totalCustomersServed);
